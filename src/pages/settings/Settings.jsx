@@ -1,7 +1,11 @@
 import "./settings.css";
 import Sidebar from "../../components/sidebar/Sidebar";
+import { useContext } from "react";
+import { Context } from "../../context/Context";
 
 export default function Settings() {
+  const {user}= useContext(Context);
+
   return (
     <div className="settings">
       <div className="settingsWrapper">
@@ -27,9 +31,9 @@ export default function Settings() {
             />
           </div>
           <label>Username</label>
-          <input type="text" placeholder="Safak" name="name" />
+          <input type="text" placeholder={user.username} name="name" />
           <label>Email</label>
-          <input type="email" placeholder="safak@gmail.com" name="email" />
+          <input type="email" placeholder={user.email} name="email" />
           <label>Password</label>
           <input type="password" placeholder="Password" name="password" />
           <button className="settingsSubmitButton" type="submit">
