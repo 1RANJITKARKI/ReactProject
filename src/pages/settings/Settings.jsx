@@ -1,10 +1,49 @@
 import "./settings.css";
 import Sidebar from "../../components/sidebar/Sidebar";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { Context } from "../../context/Context";
-
+import axios from "axios";
 export default function Settings() {
   const {user}= useContext(Context);
+  const [file, setFile] = useState("");
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [success, setSuccess] = useState(false);
+  const PF = "http://localhost:5000/images/";
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const updatedUser = {
+      userId: user._id,
+      username,
+      password,
+      email
+    };
+
+    if (file){
+      const data= new FormData();
+      const filename= Date.now() + file.name;
+      data.append("name", filename);
+      data.append("file", file);
+      updatedUser.profilePic= filename;
+
+      try {
+        await axios.post("/upload", data);
+      } catch (error) {
+        
+      }
+
+      try {
+      await axios.put("/users/" + user._id, updatedUser);
+      setSuccess(true);
+
+       
+      } catch (error) {
+        
+      }
+    }
+  };
 
   return (
     <div className="settings">
@@ -13,7 +52,7 @@ export default function Settings() {
           <span className="settingsTitleUpdate">Update Your Account</span>
           <span className="settingsTitleDelete">Delete Account</span>
         </div>
-        <form className="settingsForm">
+        <form className="settingsForm" onSubmit={handleSubmit}>
           <label>Profile Picture</label>
           <div className="settingsPP">
             <img
@@ -28,17 +67,19 @@ export default function Settings() {
               type="file"
               style={{ display: "none" }}
               className="settingsPPInput"
+              onChange={(e)=>setFile(e.target.files[0])}
             />
           </div>
           <label>Username</label>
-          <input type="text" placeholder={user.username} name="name" />
+          <input type="text" placeholder={user.username} name="name" onChange={e=> setUsername(e.target.value)}/>
           <label>Email</label>
-          <input type="email" placeholder={user.email} name="email" />
+          <input type="email" placeholder={user.email} name="email" onChange={e=> setEmail(e.target.value)}/>
           <label>Password</label>
-          <input type="password" placeholder="Password" name="password" />
+          <input type="password" placeholder="Password" name="password" onChange={e=> setPassword(e.target.value)}/>
           <button className="settingsSubmitButton" type="submit">
             Update
           </button>
+          {success && <span>Profile has been updated</span>}
         </form>
       </div>
       <Sidebar />
